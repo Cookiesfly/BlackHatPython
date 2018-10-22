@@ -23,7 +23,7 @@ def handle_client(client_socket):
     client_socket.close()
 
 while True:
-    client,  addr = server.accept()
+    client, addr = server.accept()
     print("[*] Accept connection from: {0}:{1}".format(addr[0], addr[1]))
 
     #threading
