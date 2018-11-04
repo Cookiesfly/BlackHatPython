@@ -14,8 +14,15 @@ def hexdump(src, length=16):
     for i in range(0, len(src), length):
         s = src[i:i+length]
         hexa = ' '.join(["%0*X" % (digits, ord(x)) for x in s])
-        text = ''.join([x if 0x20 <= ord(x) < 0x7F else '.' for x in s])
+        text = ''.join([chr(x) if 0x20 <= x < 0x7F else '.' for x in s])
         result.append("%04X    %-*s    %s" % (i, length*(digits + 1), hexa, text))
+
+    # for i in range(0, len(src), length):
+    #     s = src[i:i + length]
+    #     hexa = ' '.join([hex(x)[2:].upper().zfill(digits) for x in s])
+    #     text = ''.join([chr(x) if 0x20 <= x < 0x7F else '.' for x in s])
+    #     result.append("{0:04X}".format(i) + ' '*3 + hexa.ljust(length * (digits + 1)) + ' '*3 + "{0}".format(text))
+
     print("\n".join(result))
 
 # 从一个连接中接收数据并返回
@@ -37,7 +44,7 @@ def receive_from(connection):
     return buffer
 
 # 对目标是远程主机的请求进行修改
-def request_handle(buffer):
+def request_handler(buffer):
     # 此处可以添加包修改代码
     return buffer
 
@@ -55,7 +62,7 @@ def proxy_handler(client_socket, remote_host, remote_port, receive_first):
     # 如果必要从远程主机接受数据
     if receive_first:
         remote_buffer = receive_from(remote_socket)
-        hexdump(remote_socket)
+        hexdump(remote_buffer)
 
         # 发送给响应处理        
         remote_buffer = response_handler(remote_buffer)
@@ -75,7 +82,7 @@ def proxy_handler(client_socket, remote_host, remote_port, receive_first):
                 hexdump(local_buffer)
 
                 # 发送给我们的本地请求
-                local_buffer = request_handle(local_buffer)
+                local_buffer = request_handler(local_buffer)
 
                 # 向远程主机发送数据
                 remote_socket.send(local_buffer)
@@ -124,7 +131,7 @@ def server_loop(local_host, local_port, remote_host, remote_port, receive_first)
         # 打印本地连接信息
         print("[==>] Received incoming connection from {}:{}".format(addr[0], addr[1]))
         
-        # 开启一个线程于远程主机通信
+        # 开启一个线程与远程主机通信
         proxy_thread = threading.Thread(target=proxy_handler, args=(client_socket, remote_host, remote_port, receive_first))
         proxy_thread.start()
 
