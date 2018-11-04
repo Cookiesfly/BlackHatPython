@@ -13,6 +13,9 @@ def hexdump(src, length=16):
     # Python3中range替代xrange
     for i in range(0, len(src), length):
         s = src[i:i+length]
+        # %-*s 代表输入一个字符串，- 号代表左对齐、后补空白，* 号代表对齐宽度由输入时确定
+        # %*s 代表输入一个字符串，右对齐、前补空白，* 号代表对齐宽度由输入时确定
+        # %04X 代表输入一个数字，按 16 进制打印，4 个字节对齐，前补 0
         hexa = ' '.join(["%0*X" % (digits, ord(x)) for x in s])
         text = ''.join([chr(x) if 0x20 <= x < 0x7F else '.' for x in s])
         result.append("%04X    %-*s    %s" % (i, length*(digits + 1), hexa, text))
